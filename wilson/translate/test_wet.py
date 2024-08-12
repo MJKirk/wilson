@@ -354,7 +354,7 @@ class TestBern2flavio(unittest.TestCase):
         fkeys = set(self.to_wc.values.keys())
         fkeys_all = {k for sname, s in wcxf.Basis['WET', 'flavio'].sectors.items()
                          for k in s
-                         if sname not in ['mue', 'mutau', 'taue', 'nunumue', 'nunumutau', 'nunutaue', 'dF=0', 'ffnunu', 'etauemu', 'muemutau', 'cu']}  # LFV, dF=0, dC=1 not in Bern
+                         if sname not in ['mue', 'mutau', 'taue', 'nunumue', 'nunumutau', 'nunutaue', 'dF=0', 'ffnunu', 'etauemu', 'muemutau', 'cu', 'sbcu', 'dbcu']}  # LFV, dF=0, dC=1 not in Bern
         self.assertSetEqual(fkeys_all - fkeys, set(), msg="Missing coefficients")
 
 class Testflavio2Bern(unittest.TestCase):
