@@ -1642,6 +1642,134 @@ def JMS_to_FormFlavor_chrom(C, qq, parameters):
     else:
         return 'not in FormFlav_chrom'
 
+def _JMS_to_Flavio_III(C, qqqq, parameters):
+    p = parameters
+    V = ckmutil.ckm.ckm_tree(p["Vus"], p["Vub"], p["Vcb"], p["gamma"])
+    if qqqq == 'sbcu':
+        xi = V[1, 2] * V[0, 1].conj() #  V_{cb} V_{us}^*
+    elif qqqq == 'dbcu':
+        xi = V[1, 2] * V[0, 0].conj() #  V_{cb} V_{ud}^*
+    elif qqqq == 'sbuc':
+        xi = V[0, 2] * V[1, 1].conj() #  V_{ub} V_{cs}^*
+    elif qqqq == 'dbuc':
+        xi = V[0, 2] * V[1, 0].conj() #  V_{ub} V_{cd}^*
+    else:
+        raise ValueError("Unexpected flavours: {}".format(qqqq[:2]))
+    pf = sqrt(2) / p['GF'] / xi / 4
+    qqqq_fl = qqqq[1:4] + qqqq[0] # Indices flipped for flavio (sbcu -> bcus, etc)
+    Nc = 3
+    if qqqq == 'sbcu':
+        return {
+            'CVLL_' + qqqq_fl: pf * ( C["V8udLL"][0,1,2,1].conj()/2. ),
+            'CVLR_' + qqqq_fl: pf * ( C["V1udduLR"][1,2,1,0] - C["V8udduLR"][1,2,1,0]/(2.*Nc) ),
+            'CVRL_' + qqqq_fl: pf * ( C["V1udduLR"][0,1,2,1].conj() - C["V8udduLR"][0,1,2,1].conj()/(2.*Nc) ),
+            'CVRR_' + qqqq_fl: pf * ( C["V8udRR"][0,1,2,1].conj()/2. ),
+            'CSLL_' + qqqq_fl: pf * ( C["S1udduRR"][0,1,2,1].conj() - C["S8udduRR"][0,1,2,1].conj()/(2.*Nc) - C["S8udRR"][0,1,2,1].conj()/4. ),
+            'CSLR_' + qqqq_fl: pf * ( -C["V8duLR"][1,2,1,0] ),
+            'CSRL_' + qqqq_fl: pf * ( -C["V8udLR"][0,1,2,1].conj() ),
+            'CSRR_' + qqqq_fl: pf * ( C["S1udduRR"][1,2,1,0] - C["S8udduRR"][1,2,1,0]/(2.*Nc) - C["S8udRR"][1,0,1,2]/4. ),
+            'CTLL_' + qqqq_fl: pf * ( -C["S8udRR"][0,1,2,1].conj()/16. ),
+            'CTRR_' + qqqq_fl: pf * ( -C["S8udRR"][1,0,1,2]/16. ),
+            'CVLLt_' + qqqq_fl: pf * ( C["V1udLL"][0,1,2,1].conj() - C["V8udLL"][0,1,2,1].conj()/(2.*Nc) ),
+            'CVLRt_' + qqqq_fl: pf * ( C["V8udduLR"][1,2,1,0]/2. ),
+            'CVRLt_' + qqqq_fl: pf * ( C["V8udduLR"][0,1,2,1].conj()/2. ),
+            'CVRRt_' + qqqq_fl: pf * ( C["V1udRR"][0,1,2,1].conj() - C["V8udRR"][0,1,2,1].conj()/(2.*Nc) ),
+            'CSLLt_' + qqqq_fl: pf * ( -C["S1udRR"][0,1,2,1].conj()/2. + C["S8udduRR"][0,1,2,1].conj()/2. + C["S8udRR"][0,1,2,1].conj()/(4.*Nc) ),
+            'CSLRt_' + qqqq_fl: pf * ( -2*C["V1duLR"][1,2,1,0] + C["V8duLR"][1,2,1,0]/Nc ),
+            'CSRLt_' + qqqq_fl: pf * ( -2*C["V1udLR"][0,1,2,1].conj() + C["V8udLR"][0,1,2,1].conj()/Nc ),
+            'CSRRt_' + qqqq_fl: pf * ( -C["S1udRR"][1,0,1,2]/2. + C["S8udduRR"][1,2,1,0]/2. + C["S8udRR"][1,0,1,2]/(4.*Nc) ),
+            'CTLLt_' + qqqq_fl: pf * ( -C["S1udRR"][0,1,2,1].conj()/8. + C["S8udRR"][0,1,2,1].conj()/(16.*Nc) ),
+            'CTRRt_' + qqqq_fl: pf * ( -C["S1udRR"][1,0,1,2]/8. + C["S8udRR"][1,0,1,2]/(16.*Nc) ),
+        }
+    elif qqqq == 'dbcu':
+        return {
+            'CVLL_' + qqqq_fl: pf * ( C["V8udLL"][0,1,2,0].conj()/2. ),
+            'CVLR_' + qqqq_fl: pf * ( C["V1udduLR"][1,2,0,0] - C["V8udduLR"][1,2,0,0]/(2.*Nc) ),
+            'CVRL_' + qqqq_fl: pf * ( C["V1udduLR"][0,0,2,1].conj() - C["V8udduLR"][0,0,2,1].conj()/(2.*Nc) ),
+            'CVRR_' + qqqq_fl: pf * ( C["V8udRR"][0,1,2,0].conj()/2. ),
+            'CSLL_' + qqqq_fl: pf * ( C["S1udduRR"][0,0,2,1].conj() - C["S8udduRR"][0,0,2,1].conj()/(2.*Nc) - C["S8udRR"][0,1,2,0].conj()/4. ),
+            'CSLR_' + qqqq_fl: pf * ( -C["V8duLR"][0,2,1,0] ),
+            'CSRL_' + qqqq_fl: pf * ( -C["V8udLR"][0,1,2,0].conj() ),
+            'CSRR_' + qqqq_fl: pf * ( C["S1udduRR"][1,2,0,0] - C["S8udduRR"][1,2,0,0]/(2.*Nc) - C["S8udRR"][1,0,0,2]/4. ),
+            'CTLL_' + qqqq_fl: pf * ( -C["S8udRR"][0,1,2,0].conj()/16. ),
+            'CTRR_' + qqqq_fl: pf * ( -C["S8udRR"][1,0,0,2]/16. ),
+            'CVLLt_' + qqqq_fl: pf * ( C["V1udLL"][0,1,2,0].conj() - C["V8udLL"][0,1,2,0].conj()/(2.*Nc) ),
+            'CVLRt_' + qqqq_fl: pf * ( C["V8udduLR"][1,2,0,0]/2. ),
+            'CVRLt_' + qqqq_fl: pf * ( C["V8udduLR"][0,0,2,1].conj()/2. ),
+            'CVRRt_' + qqqq_fl: pf * ( C["V1udRR"][0,1,2,0].conj() - C["V8udRR"][0,1,2,0].conj()/(2.*Nc) ),
+            'CSLLt_' + qqqq_fl: pf * ( -C["S1udRR"][0,1,2,0].conj()/2. + C["S8udduRR"][0,0,2,1].conj()/2. + C["S8udRR"][0,1,2,0].conj()/(4.*Nc) ),
+            'CSLRt_' + qqqq_fl: pf * ( -2*C["V1duLR"][0,2,1,0] + C["V8duLR"][0,2,1,0]/Nc ),
+            'CSRLt_' + qqqq_fl: pf * ( -2*C["V1udLR"][0,1,2,0].conj() + C["V8udLR"][0,1,2,0].conj()/Nc ),
+            'CSRRt_' + qqqq_fl: pf * ( -C["S1udRR"][1,0,0,2]/2. + C["S8udduRR"][1,2,0,0]/2. + C["S8udRR"][1,0,0,2]/(4.*Nc) ),
+            'CTLLt_' + qqqq_fl: pf * ( -C["S1udRR"][0,1,2,0].conj()/8. + C["S8udRR"][0,1,2,0].conj()/(16.*Nc) ),
+            'CTRRt_' + qqqq_fl: pf * ( -C["S1udRR"][1,0,0,2]/8. + C["S8udRR"][1,0,0,2]/(16.*Nc) ),
+        }
+    else:
+        raise ValueError(f"Sector not implemented: {qqqq}")
+
+def _Flavio_to_JMS_III(C, qqqq, parameters):
+    p = parameters
+    V = ckmutil.ckm.ckm_tree(p["Vus"], p["Vub"], p["Vcb"], p["gamma"])
+    if qqqq == 'sbcu':
+        xi = V[1, 2] * V[0, 1].conj() #  V_{cb} V_{us}^*
+    elif qqqq == 'dbcu':
+        xi = V[1, 2] * V[0, 0].conj() #  V_{cb} V_{ud}^*
+    elif qqqq == 'sbuc':
+        xi = V[0, 2] * V[1, 1].conj() #  V_{ub} V_{cs}^*
+    elif qqqq == 'dbuc':
+        xi = V[0, 2] * V[1, 0].conj() #  V_{ub} V_{cd}^*
+    else:
+        raise ValueError("Unexpected flavours: {}".format(qqqq[:2]))
+    pf = 4 * p['GF'] * xi / sqrt(2)
+    Nc = 3
+    if qqqq == 'sbcu':
+        return {
+            'V1udLL_1232': pf * ( C["CVLL_bcus"].conjugate()/Nc + C["CVLLt_bcus"].conjugate() ),
+            'V8udLL_1232': pf * ( 2*C["CVLL_bcus"].conjugate() ),
+            'V1udRR_1232': pf * ( C["CVRR_bcus"].conjugate()/Nc + C["CVRRt_bcus"].conjugate() ),
+            'V8udRR_1232': pf * ( 2*C["CVRR_bcus"].conjugate() ),
+            'V1udLR_1232': pf * ( -C["CSRL_bcus"].conjugate()/(2.*Nc) - C["CSRLt_bcus"].conjugate()/2. ),
+            'V8udLR_1232': pf * ( -C["CSRL_bcus"].conjugate() ),
+            'V1duLR_2321': pf * ( -C["CSLR_bcus"]/(2.*Nc) - C["CSLRt_bcus"]/2. ),
+            'V8duLR_2321': pf * ( -C["CSLR_bcus"] ),
+            'V1udduLR_1232': pf * ( C["CVRL_bcus"].conjugate() + C["CVRLt_bcus"].conjugate()/Nc ),
+            'V8udduLR_1232': pf * ( 2*C["CVRLt_bcus"].conjugate() ),
+            'V1udduLR_2321': pf * ( C["CVLR_bcus"] + C["CVLRt_bcus"]/Nc ),
+            'V8udduLR_2321': pf * ( 2*C["CVLRt_bcus"] ),
+            'S1udRR_1232': pf * ( (-8*C["CTLL_bcus"]).conjugate()/Nc - 8*C["CTLLt_bcus"].conjugate() ),
+            'S8udRR_1232': pf * ( -16*C["CTLL_bcus"].conjugate() ),
+            'S1udduRR_1232': pf * ( C["CSLL_bcus"].conjugate() + C["CSLLt_bcus"].conjugate()/Nc - 4*C["CTLL_bcus"].conjugate() - (4*C["CTLLt_bcus"]).conjugate()/Nc ),
+            'S8udduRR_1232': pf * ( 2*C["CSLLt_bcus"].conjugate() - 8*C["CTLLt_bcus"].conjugate() ),
+            'S1udRR_2123': pf * ( (-8*C["CTRR_bcus"])/Nc - 8*C["CTRRt_bcus"] ),
+            'S8udRR_2123': pf * ( -16*C["CTRR_bcus"] ),
+            'S1udduRR_2321': pf * ( C["CSRR_bcus"] + C["CSRRt_bcus"]/Nc - 4*C["CTRR_bcus"] - (4*C["CTRRt_bcus"])/Nc ),
+            'S8udduRR_2321': pf * ( 2*C["CSRRt_bcus"] - 8*C["CTRRt_bcus"] ),
+        }
+    elif qqqq == 'dbcu':
+        return {
+            'V1udLL_1231': pf * ( C["CVLL_bcud"].conjugate()/Nc + C["CVLLt_bcud"].conjugate() ),
+            'V8udLL_1231': pf * ( 2*C["CVLL_bcud"].conjugate() ),
+            'V1udRR_1231': pf * ( C["CVRR_bcud"].conjugate()/Nc + C["CVRRt_bcud"].conjugate() ),
+            'V8udRR_1231': pf * ( 2*C["CVRR_bcud"].conjugate() ),
+            'V1udLR_1231': pf * ( -C["CSRL_bcud"].conjugate()/(2.*Nc) - C["CSRLt_bcud"].conjugate()/2. ),
+            'V8udLR_1231': pf * ( -C["CSRL_bcud"].conjugate() ),
+            'V1duLR_1321': pf * ( -C["CSLR_bcud"]/(2.*Nc) - C["CSLRt_bcud"]/2. ),
+            'V8duLR_1321': pf * ( -C["CSLR_bcud"] ),
+            'V1udduLR_1132': pf * ( C["CVRL_bcud"].conjugate() + C["CVRLt_bcud"].conjugate()/Nc ),
+            'V8udduLR_1132': pf * ( 2*C["CVRLt_bcud"].conjugate() ),
+            'V1udduLR_2311': pf * ( C["CVLR_bcud"] + C["CVLRt_bcud"]/Nc ),
+            'V8udduLR_2311': pf * ( 2*C["CVLRt_bcud"] ),
+            'S1udRR_1231': pf * ( (-8*C["CTLL_bcud"]).conjugate()/Nc - 8*C["CTLLt_bcud"].conjugate() ),
+            'S8udRR_1231': pf * ( -16*C["CTLL_bcud"].conjugate() ),
+            'S1udduRR_1132': pf * ( C["CSLL_bcud"].conjugate() + C["CSLLt_bcud"].conjugate()/Nc - 4*C["CTLL_bcud"].conjugate() - (4*C["CTLLt_bcud"]).conjugate()/Nc ),
+            'S8udduRR_1132': pf * ( 2*C["CSLLt_bcud"].conjugate() - 8*C["CTLLt_bcud"].conjugate() ),
+            'S1udRR_2113': pf * ( (-8*C["CTRR_bcud"])/Nc - 8*C["CTRRt_bcud"] ),
+            'S8udRR_2113': pf * ( -16*C["CTRR_bcud"] ),
+            'S1udduRR_2311': pf * ( C["CSRR_bcud"] + C["CSRRt_bcud"]/Nc - 4*C["CTRR_bcud"] - (4*C["CTRRt_bcud"])/Nc ),
+            'S8udduRR_2311': pf * ( 2*C["CSRRt_bcud"] - 8*C["CTRRt_bcud"] ),
+        }
+    else:
+        raise ValueError(f"Sector not implemented: {qqqq}")
 
 def _JMS_to_Flavio_VII(C, parameters):
     """From JMS to flavio basis for class VII, i.e. flavour blind operators."""
@@ -1783,6 +1911,11 @@ def JMS_to_flavio(Cflat, scale, parameters=None, sectors=None):
                     d.update(_BernII_to_Flavio_II(_JMS_to_Bern_II(C,
                                                   qq+'l_'+l+'nu_'+lp),
                                                   qq+'l_'+l+'nu_'+lp, p))
+
+    # Class III
+    for qqqq in ['sbcu', 'dbcu']: # 'sbuc', 'dbuc' not implemented yet
+        if sectors is None or qqqq in sectors:
+            d.update(_JMS_to_Flavio_III(C, qqqq, p))
 
     # Class V semileptonic
     for l in lflav.keys():
@@ -2143,6 +2276,11 @@ def flavio_to_JMS(C_incomplete, scale, parameters=None, sectors=None):
                     d.update(_Bern_to_JMS_II(_FlavioII_to_BernII(C,
                                              qq+'l_'+l+'nu_'+lp, p),
                                              qq+'l_'+l+'nu_'+lp))
+
+    # Class III
+    for qqqq in ['sbcu', 'dbcu']: # 'sbuc', 'dbuc' not implemented yet
+        if sectors is None or qqqq in sectors:
+            d.update(_Flavio_to_JMS_III(C, qqqq, p))
 
     # Class V semileptonic
     for l in lflav.keys():
